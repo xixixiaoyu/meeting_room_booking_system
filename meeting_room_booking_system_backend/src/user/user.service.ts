@@ -115,8 +115,6 @@ export class UserService {
       relations: ['roles', 'roles.permissions'],
     });
 
-    console.log('user', user);
-
     if (!user) {
       throw new HttpException('用户不存在', HttpStatus.BAD_REQUEST);
     }
