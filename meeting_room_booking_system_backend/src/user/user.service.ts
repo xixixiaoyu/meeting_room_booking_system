@@ -8,7 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from 'src/redis/redis.service';
 import { md5 } from 'src/utils';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { User } from './entities/user.entity';
 import { Role } from './entities/role.entity';
@@ -254,5 +254,72 @@ export class UserService {
     user.isFrozen = true;
 
     await this.userRepository.save(user);
+  }
+
+  async findUsersByPage(pageNo: number, pageSize: number) {
+    const skipCount = (pageNo - 1) * pageSize;
+
+    const [users, totalCount] = await this.userRepository.findAndCount({
+      select: [
+        'id',
+        'username',
+        'nickName',
+        'email',
+        'phoneNumber',
+        'isFrozen',
+        'headPic',
+        'createTime',
+      ],
+      skip: skipCount,
+      take: pageSize,
+    });
+
+    return {
+      users,
+      totalCount,
+    };
+  }
+
+  async findUsers(
+    username: string,
+    nickName: string,
+    email: string,
+    pageNo: number,
+    pageSize: number,
+  ) {
+    const skipCount = (pageNo - 1) * pageSize;
+
+    const condition: Record<string, any> = {};
+
+    if (username) {
+      condition.username = Like(`%${username}%`);
+    }
+    if (nickName) {
+      condition.nickName = Like(`%${nickName}%`);
+    }
+    if (email) {
+      condition.email = Like(`%${email}%`);
+    }
+
+    const [users, totalCount] = await this.userRepository.findAndCount({
+      select: [
+        'id',
+        'username',
+        'nickName',
+        'email',
+        'phoneNumber',
+        'isFrozen',
+        'headPic',
+        'createTime',
+      ],
+      skip: skipCount,
+      take: pageSize,
+      where: condition,
+    });
+
+    return {
+      users,
+      totalCount,
+    };
   }
 }
