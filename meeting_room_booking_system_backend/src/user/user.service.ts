@@ -245,4 +245,14 @@ export class UserService {
       return '用户信息修改成功';
     }
   }
+
+  async freezeUserById(id: number) {
+    const user = await this.userRepository.findOneBy({
+      id,
+    });
+
+    user.isFrozen = true;
+
+    await this.userRepository.save(user);
+  }
 }
