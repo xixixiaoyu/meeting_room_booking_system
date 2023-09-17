@@ -1,4 +1,5 @@
-import { Button, Form, Input } from 'antd'
+import { Button, Form, Input, message } from 'antd'
+import { login } from './interfaces'
 import './login.css'
 
 interface LoginUser {
@@ -6,8 +7,19 @@ interface LoginUser {
 	password: string
 }
 
-const onFinish = (values: LoginUser) => {
-	console.log(values)
+const onFinish = async (values: LoginUser) => {
+	const res = await login(values.username, values.password)
+
+	const { data } = res.data
+	if (res.status === 201 || res.status === 200) {
+		message.success('登录成功')
+
+		localStorage.setItem('access_token', data.accessToken)
+		localStorage.setItem('refresh_token', data.refreshToken)
+		localStorage.setItem('user_info', JSON.stringify(data.userInfo))
+	} else {
+		message.error(data || '系统繁忙，请稍后再试')
+	}
 }
 
 const layout1 = {
