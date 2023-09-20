@@ -4,6 +4,7 @@ import { useCallback, useEffect } from 'react'
 import './update_info.css'
 import { useNavigate } from 'react-router-dom'
 import { getUserInfo, updateInfo, updateUserInfoCaptcha } from '../../interface/interfaces'
+import { HeadPicUpload } from './HeadPicUpload'
 
 export interface UserInfo {
 	headPic: string
@@ -64,7 +65,7 @@ export function UpdateInfo() {
 		<div id="updateInfo-container">
 			<Form form={form} {...layout1} onFinish={onFinish} colon={false} autoComplete="off">
 				<Form.Item label="头像" name="headPic" rules={[{ required: true, message: '请输入头像!' }]}>
-					<Input />
+					<HeadPicUpload />
 				</Form.Item>
 
 				<Form.Item
