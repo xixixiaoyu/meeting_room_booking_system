@@ -5,6 +5,7 @@ import { ColumnsType } from 'antd/es/table'
 import { useForm } from 'antd/es/form/Form'
 import { deleteMeetingRoom, meetingRoomList } from '../../interfaces/interfaces'
 import { CreateMeetingRoomModal } from './CreateMeetingRoomModal'
+import { UpdateMeetingRoomModal } from './UpdateMeetingRoom'
 
 interface SearchMeetingRoom {
 	name: string
@@ -30,6 +31,8 @@ export function MeetingRoomManage() {
 	const [meetingRoomResult, setMeetingRoomResult] = useState<Array<MeetingRoomSearchResult>>([])
 	const [num, setNum] = useState<number>()
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+	const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
+	const [updateId, setUpdateId] = useState<number>()
 
 	const columns: ColumnsType<MeetingRoomSearchResult> = useMemo(
 		() => [
@@ -74,15 +77,27 @@ export function MeetingRoomManage() {
 			{
 				title: '操作',
 				render: (_, record) => (
-					<Popconfirm
-						title="会议室删除"
-						description="确认删除吗？"
-						onConfirm={() => handleDelete(record.id)}
-						okText="Yes"
-						cancelText="No"
-					>
-						<a href="#">删除</a>
-					</Popconfirm>
+					<div>
+						<Popconfirm
+							title="会议室删除"
+							description="确认删除吗？"
+							onConfirm={() => handleDelete(record.id)}
+							okText="Yes"
+							cancelText="No"
+						>
+							<a href="#">删除</a>
+						</Popconfirm>
+						<br />
+						<a
+							href="#"
+							onClick={() => {
+								setIsUpdateModalOpen(true)
+								setUpdateId(record.id)
+							}}
+						>
+							更新
+						</a>
+					</div>
 				),
 			},
 		],
@@ -188,8 +203,18 @@ export function MeetingRoomManage() {
 				isOpen={isCreateModalOpen}
 				handleClose={() => {
 					setIsCreateModalOpen(false)
+					setNum(Math.random())
 				}}
 			></CreateMeetingRoomModal>
+
+			<UpdateMeetingRoomModal
+				id={updateId!}
+				isOpen={isUpdateModalOpen}
+				handleClose={() => {
+					setIsUpdateModalOpen(false)
+					setNum(Math.random())
+				}}
+			></UpdateMeetingRoomModal>
 		</div>
 	)
 }

@@ -1,18 +1,17 @@
 import { Form, Input, InputNumber, message, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback } from 'react'
-import { createMeetingRoom } from '../../interfaces/interfaces'
+import { useCallback, useEffect } from 'react'
+import { findMeetingRoom, updateMeetingRoom } from '../../interfaces/interfaces'
 
-interface CreateMeetingRoomModalProps {
+interface UpdateMeetingRoomModalProps {
+	id: number
 	isOpen: boolean
 	handleClose: Function
 }
-const layout = {
-	labelCol: { span: 6 },
-	wrapperCol: { span: 18 },
-}
-export interface CreateMeetingRoom {
+
+export interface UpdateMeetingRoom {
+	id: number
 	name: string
 	capacity: number
 	location: string
@@ -20,8 +19,36 @@ export interface CreateMeetingRoom {
 	description: string
 }
 
-export function CreateMeetingRoomModal(props: CreateMeetingRoomModalProps) {
-	const [form] = useForm<CreateMeetingRoom>()
+const layout = {
+	labelCol: { span: 6 },
+	wrapperCol: { span: 18 },
+}
+
+export function UpdateMeetingRoomModal(props: UpdateMeetingRoomModalProps) {
+	const [form] = useForm<UpdateMeetingRoom>()
+
+	useEffect(() => {
+		async function query() {
+			if (!props.id) {
+				return
+			}
+			const res = await findMeetingRoom(props.id)
+
+			const { data } = res
+			if (res.status === 200 || res.status === 201) {
+				form.setFieldValue('id', data.data.id)
+				form.setFieldValue('name', data.data.name)
+				form.setFieldValue('location', data.data.location)
+				form.setFieldValue('capacity', data.data.capacity)
+				form.setFieldValue('equipment', data.data.equipment)
+				form.setFieldValue('description', data.data.description)
+			} else {
+				message.error(res.data.data)
+			}
+		}
+
+		query()
+	}, [props.id])
 
 	const handleOk = useCallback(async function () {
 		const values = form.getFieldsValue()
@@ -29,11 +56,13 @@ export function CreateMeetingRoomModal(props: CreateMeetingRoomModalProps) {
 		values.description = values.description || ''
 		values.equipment = values.equipment || ''
 
-		const res = await createMeetingRoom(values)
+		const res = await updateMeetingRoom({
+			...values,
+			id: form.getFieldValue('id'),
+		})
 
 		if (res.status === 201 || res.status === 200) {
-			message.success('创建成功')
-			form.resetFields()
+			message.success('更新成功')
 			props.handleClose()
 		} else {
 			message.error(res.data.data)
@@ -42,11 +71,11 @@ export function CreateMeetingRoomModal(props: CreateMeetingRoomModalProps) {
 
 	return (
 		<Modal
-			title="创建会议室"
+			title="更新会议室"
 			open={props.isOpen}
 			onOk={handleOk}
 			onCancel={() => props.handleClose()}
-			okText={'创建'}
+			okText={'更新'}
 		>
 			<Form form={form} colon={false} {...layout}>
 				<Form.Item
