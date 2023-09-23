@@ -4,6 +4,7 @@ import './meeting_room_manage.css'
 import { ColumnsType } from 'antd/es/table'
 import { useForm } from 'antd/es/form/Form'
 import { deleteMeetingRoom, meetingRoomList } from '../../interfaces/interfaces'
+import { CreateMeetingRoomModal } from './CreateMeetingRoomModal'
 
 interface SearchMeetingRoom {
 	name: string
@@ -28,6 +29,7 @@ export function MeetingRoomManage() {
 	const [pageSize, setPageSize] = useState<number>(10)
 	const [meetingRoomResult, setMeetingRoomResult] = useState<Array<MeetingRoomSearchResult>>([])
 	const [num, setNum] = useState<number>()
+	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
 	const columns: ColumnsType<MeetingRoomSearchResult> = useMemo(
 		() => [
@@ -160,6 +162,13 @@ export function MeetingRoomManage() {
 						<Button type="primary" style={{ background: 'green' }}>
 							添加会议室
 						</Button>
+						<Button
+							type="primary"
+							style={{ background: 'green' }}
+							onClick={() => setIsCreateModalOpen(true)}
+						>
+							添加会议室
+						</Button>
 					</Form.Item>
 				</Form>
 			</div>
@@ -174,6 +183,13 @@ export function MeetingRoomManage() {
 					}}
 				/>
 			</div>
+
+			<CreateMeetingRoomModal
+				isOpen={isCreateModalOpen}
+				handleClose={() => {
+					setIsCreateModalOpen(false)
+				}}
+			></CreateMeetingRoomModal>
 		</div>
 	)
 }
